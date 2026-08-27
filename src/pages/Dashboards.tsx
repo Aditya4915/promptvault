@@ -1,15 +1,13 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../redux/store";
+
+import { useSelector } from "react-redux";
+import type { RootState} from "../redux/store";
 
 import DashboardCard from "../components/DashboardCard";
 import PromptCard from "../components/PromptCard";
 
-import { fetchPrompts } from "../features/promptSlice";
 
 const Dashboards = () => {
 
-  const dispatch = useDispatch<AppDispatch>();
 
 
   // Get prompts
@@ -32,11 +30,6 @@ const Dashboards = () => {
       state.prompts
   );
 
-
-  // Fetch prompts
-  useEffect(() => {
-    dispatch(fetchPrompts());
-  }, [dispatch]);
 
 
   // Search prompts
@@ -99,13 +92,13 @@ const Dashboards = () => {
     <div>
 
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
 
         <h1 className="text-3xl font-bold text-gray-900">
           Dashboard
         </h1>
 
-        <p className="mt-2 text-gray-500">
+        <p className=" text-gray-500">
           Welcome back! Here's what's happening
           with your prompts.
         </p>

@@ -7,7 +7,11 @@ import PageNotFound from "./pages/PageNotFound";
 import Pinned from "./pages/Pinned";
 import AddPrompt from "./pages/AddPrompt";
 
-const App = () => {
+
+const App = () => 
+{
+
+
   return (
     <Routes>
       <Route element={<Layout />}>

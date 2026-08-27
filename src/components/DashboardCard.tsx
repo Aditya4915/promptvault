@@ -18,14 +18,10 @@ const DashboardCard = () => {
   const totalPrompts = prompts.length;
 
   // Favorite prompts
-  const favoritePrompts = prompts.filter(
-    (prompt) => prompt.favorite
-  ).length;
+  const favoritePrompts = prompts.filter((prompt) => prompt.favorite).length;
 
   // Unique categories
-  const categories = new Set(
-    prompts.map((prompt) => prompt.category)
-  ).size;
+  const categories = new Set(prompts.map((prompt) => prompt.category)).size;
 
   // Recently added
   const recentlyAdded = prompts.filter((prompt) => {
@@ -42,7 +38,7 @@ const DashboardCard = () => {
 
 
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
 
       {/* Total Prompts */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">

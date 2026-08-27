@@ -1,7 +1,25 @@
-import {Copy, Edit, Heart, Pin, Trash2, GripVertical,CopyPlus,} from "lucide-react";
+import {
+  Copy,
+  Edit,
+  Heart,
+  Pin,
+  Trash2,
+  GripVertical,
+  CopyPlus,
+  X,
+} from "lucide-react";
+
 import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+
 import type { AppDispatch } from "../redux/store";
-import { toggleFavoriteBackend, togglePinBackend, deletePromptFromBackend,} from "../features/promptSlice";
+
+import {
+  toggleFavoriteBackend,
+  togglePinBackend,
+  deletePromptFromBackend,
+  updatePromptBackend,
+} from "../features/promptSlice";
 
 interface PromptCardProps {
   id: string;
@@ -24,6 +42,21 @@ const PromptCard = ({
 }: PromptCardProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [editTitle, setEditTitle] = useState(title);
+  const [editDescription, setEditDescription] = useState(description);
+  const [editCategory, setEditCategory] = useState(category);
+
+  // Reset form whenever edit modal opens
+  useEffect(() => {
+    if (isEditing) {
+      setEditTitle(title);
+      setEditDescription(description);
+      setEditCategory(category);
+    }
+  }, [isEditing, title, description, category]);
+
   const prompt = {
     id,
     title,
@@ -32,6 +65,35 @@ const PromptCard = ({
     date,
     favorite,
     pinned,
+  };
+
+  const handleUpdate = async () => {
+    if (
+      editTitle.trim() === "" ||
+      editDescription.trim() === "" ||
+      editCategory.trim() === ""
+    ) {
+      alert("Please add valid details");
+      return;
+    }
+
+    try {
+      await dispatch(
+        updatePromptBackend({
+          id,
+          data: {
+            title: editTitle.trim(),
+            description: editDescription.trim(),
+            category: editCategory.trim(),
+          },
+        })
+      ).unwrap();
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to update prompt:", error);
+      alert("Failed to update prompt");
+    }
   };
 
   return (
@@ -86,7 +148,6 @@ const PromptCard = ({
       </div>
 
       {/* Content */}
-
       <h2 className="mt-4 text-lg font-semibold text-gray-900">
         {title}
       </h2>
@@ -96,8 +157,7 @@ const PromptCard = ({
       </p>
 
       {/* Category */}
-
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
           {category}
         </span>
@@ -108,7 +168,6 @@ const PromptCard = ({
       </div>
 
       {/* Actions */}
-
       <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
 
         {/* Copy */}
@@ -134,30 +193,119 @@ const PromptCard = ({
 
           {/* Edit */}
           <button
+            onClick={() => setIsEditing(true)}
             className="text-gray-400 hover:text-blue-600"
             title="Edit"
           >
             <Edit size={17} />
           </button>
 
-            <button
-              onClick={() => {
-                const confirmed = window.confirm(
-                  "Are you sure you want to delete this prompt?"
-                );
+          {/* Delete */}
+          <button
+            onClick={() => {
+              const confirmed = window.confirm(
+                "Are you sure you want to delete this prompt?"
+              );
 
-                if (confirmed) {
-                  dispatch(deletePromptFromBackend(id));
-                }
-              }}
-              className="text-gray-400 hover:text-red-600"
-              title="Delete"
-            >
-              <Trash2 size={17} />
-            </button>
+              if (confirmed) {
+                dispatch(deletePromptFromBackend(id));
+              }
+            }}
+            className="text-gray-400 hover:text-red-600"
+            title="Delete"
+          >
+            <Trash2 size={17} />
+          </button>
 
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+
+          <div className="relative w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+
+            {/* Close */}
+            <button
+              onClick={() => setIsEditing(false)}
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-700"
+            >
+              <X size={20} />
+            </button>
+
+            <h2 className="mb-5 text-xl font-semibold text-gray-900">
+              Edit Prompt
+            </h2>
+
+            {/* Title */}
+            <div className="mb-4">
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Title
+              </label>
+
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="mb-4">
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Description
+              </label>
+
+              <textarea
+                value={editDescription}
+                onChange={(e) =>
+                  setEditDescription(e.target.value)
+                }
+                rows={5}
+                className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Category */}
+            <div className="mb-5">
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Category
+              </label>
+
+              <input
+                type="text"
+                value={editCategory}
+                onChange={(e) =>
+                  setEditCategory(e.target.value)
+                }
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setIsEditing(false)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleUpdate}
+                className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+              >
+                Save Changes
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };

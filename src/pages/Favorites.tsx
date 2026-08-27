@@ -1,59 +1,98 @@
-import { Star } from "lucide-react";
+import { useState } from "react";
+import { Star, SlidersHorizontal, ChevronDown } from "lucide-react";
+
 import PromptCard from "../components/PromptCard";
 import CategoryFilter from "../components/CategoryFilter";
+
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 
 
 const Favorites = () => {
 
+  // Sort state
+  const [sortBy, setSortBy] = useState("newest");
+  const [showSort, setShowSort] = useState(false);
+
+
   // Get all prompts
-  const prompts = useSelector((state: RootState) =>state.prompts.prompts);
+  const prompts = useSelector(
+    (state: RootState) => state.prompts.prompts
+  );
 
 
   // Get global search text
-  const searchText = useSelector((state: RootState) =>state.prompts.searchText);
+  const searchText = useSelector(
+    (state: RootState) => state.prompts.searchText
+  );
 
 
   // Get selected category
-  const selectedCategory = useSelector((state: RootState) =>state.categories.selectedCategory);
+  const selectedCategory = useSelector(
+    (state: RootState) => state.categories.selectedCategory
+  );
 
 
   // Favorite + Search + Category filter
-  const favoritePrompts = prompts.filter(
-    (prompt) => {
+  const favoritePrompts = prompts.filter((prompt) => {
 
-      // 1. Favorite filter
-      if (!prompt.favorite) {
-        return false;
-      }
-
-
-      // 2. Search filter
-      const search =
-        searchText.toLowerCase().trim();
-
-      const matchesSearch =
-        !search ||
-        prompt.title
-          .toLowerCase()
-          .includes(search) ||
-        prompt.description
-          .toLowerCase()
-          .includes(search) ||
-        prompt.category
-          .toLowerCase()
-          .includes(search);
-
-
-      // 3. Category filter
-      const matchesCategory =
-        selectedCategory === "All" ||
-        prompt.category === selectedCategory;
-
-      return matchesSearch && matchesCategory;
+    // 1. Favorite filter
+    if (!prompt.favorite) {
+      return false;
     }
-  );
+
+
+    // 2. Search filter
+    const search = searchText.toLowerCase().trim();
+
+    const matchesSearch =
+      !search ||
+      prompt.title.toLowerCase().includes(search) ||
+      prompt.description.toLowerCase().includes(search) ||
+      prompt.category.toLowerCase().includes(search);
+
+
+    // 3. Category filter
+    const matchesCategory =
+      selectedCategory === "All" ||
+      prompt.category === selectedCategory;
+
+
+    return matchesSearch && matchesCategory;
+  });
+
+
+  // Sort
+  const sortedPrompts = [...favoritePrompts].sort((a, b) => {
+
+    if (sortBy === "newest") {
+      return (
+        new Date(b.date).getTime() -
+        new Date(a.date).getTime()
+      );
+    }
+
+
+    if (sortBy === "oldest") {
+      return (
+        new Date(a.date).getTime() -
+        new Date(b.date).getTime()
+      );
+    }
+
+
+    if (sortBy === "az") {
+      return a.title.localeCompare(b.title);
+    }
+
+
+    if (sortBy === "za") {
+      return b.title.localeCompare(a.title);
+    }
+
+
+    return 0;
+  });
 
 
   return (
@@ -85,6 +124,95 @@ const Favorites = () => {
       </div>
 
 
+      {/* Sort */}
+      <div className="relative mb-4 flex justify-end">
+
+        <button
+          onClick={() => setShowSort(!showSort)}
+          className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm hover:bg-gray-50"
+        >
+          <SlidersHorizontal size={16} />
+
+          Sort
+
+          <ChevronDown
+            size={16}
+            className={`transition-transform ${
+              showSort ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+
+        {/* Sort Dropdown */}
+        {showSort && (
+          <div className="absolute right-0 top-11 z-10 w-44 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+
+            <button
+              onClick={() => {
+                setSortBy("newest");
+                setShowSort(false);
+              }}
+              className={`w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 ${
+                sortBy === "newest"
+                  ? "bg-purple-50 text-purple-600"
+                  : "text-gray-700"
+              }`}
+            >
+              Newest First
+            </button>
+
+
+            <button
+              onClick={() => {
+                setSortBy("oldest");
+                setShowSort(false);
+              }}
+              className={`w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 ${
+                sortBy === "oldest"
+                  ? "bg-purple-50 text-purple-600"
+                  : "text-gray-700"
+              }`}
+            >
+              Oldest First
+            </button>
+
+
+            <button
+              onClick={() => {
+                setSortBy("az");
+                setShowSort(false);
+              }}
+              className={`w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 ${
+                sortBy === "az"
+                  ? "bg-purple-50 text-purple-600"
+                  : "text-gray-700"
+              }`}
+            >
+              Title A → Z
+            </button>
+
+
+            <button
+              onClick={() => {
+                setSortBy("za");
+                setShowSort(false);
+              }}
+              className={`w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 ${
+                sortBy === "za"
+                  ? "bg-purple-50 text-purple-600"
+                  : "text-gray-700"
+              }`}
+            >
+              Title Z → A
+            </button>
+
+          </div>
+        )}
+
+      </div>
+
+
       {/* Category Filter */}
       <div className="mb-6">
         <CategoryFilter />
@@ -93,11 +221,11 @@ const Favorites = () => {
 
       {/* Prompt Cards */}
 
-      {favoritePrompts.length > 0 ? (
+      {sortedPrompts.length > 0 ? (
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
 
-          {favoritePrompts.map((prompt) => (
+          {sortedPrompts.map((prompt) => (
 
             <PromptCard
               key={prompt.id}

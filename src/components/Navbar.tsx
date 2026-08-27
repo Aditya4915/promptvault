@@ -1,42 +1,20 @@
-import {
-  Bell,
-  Moon,
-  Plus,
-  Search,
-} from "lucide-react";
-
+import {Bell,Moon,Plus,Search,} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {
-  useDispatch,
-  useSelector,
-} from "react-redux";
-
-import type {
-  AppDispatch,
-  RootState,
-} from "../redux/store";
-
-import {
-  handleSearchText,
-} from "../features/promptSlice";
+import {useDispatch,useSelector,} from "react-redux";
+import type { AppDispatch,RootState,} from "../redux/store";
+import {handleSearchText,} from "../features/promptSlice";
 
 
 const Navbar = () => {
 
   const navigate = useNavigate();
-
   const dispatch = useDispatch<AppDispatch>();
 
-
   // Get search text from Redux
-  const searchText = useSelector(
-    (state: RootState) =>
-      state.prompts.searchText
-  );
-
+  const searchText = useSelector((state: RootState) =>state.prompts.searchText);
 
   return (
-    <header className="w-full flex justify-evenly mt-4">
+    <header className="fixed left-64 right-0 px-6 gap-6 h-16 border-b border-gray-200  flex justify-between items-center bg-white">
 
       {/* Search */}
       <div className="relative w-[405px]">

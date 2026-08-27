@@ -1,7 +1,10 @@
 const API_URL = "https://prompt-backend-4ipo.onrender.com";
 
 
-// GET
+// =========================
+// GET PROMPTS
+// =========================
+
 export const getPrompts = async () => {
   const response = await fetch(`${API_URL}/prompts`);
 
@@ -13,7 +16,10 @@ export const getPrompts = async () => {
 };
 
 
-// POST
+// =========================
+// CREATE PROMPT
+// =========================
+
 export const createPrompt = async (prompt: {
   title: string;
   description: string;
@@ -38,10 +44,17 @@ export const createPrompt = async (prompt: {
 };
 
 
-// PUT - Favorite / Pin
+// =========================
+// UPDATE PROMPT
+// Favorite / Pin / Edit
+// =========================
+
 export const updatePrompt = async (
   id: string,
   data: {
+    title?: string;
+    description?: string;
+    category?: string;
     favorite?: boolean;
     pinned?: boolean;
   },
@@ -65,7 +78,10 @@ export const updatePrompt = async (
 };
 
 
-// DELETE
+// =========================
+// DELETE PROMPT
+// =========================
+
 export const deletePromptApi = async (id: string) => {
   const response = await fetch(
     `${API_URL}/prompts/${id}`,

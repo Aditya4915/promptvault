@@ -22,6 +22,11 @@ const AddPrompt = () => {
       pinned: false,
     };
 
+    if (newPrompt.title==="" || newPrompt.description==="" || newPrompt.category==="")
+    {
+      alert("please add valid details")
+      return
+    }
     try {
       await dispatch(addPromptToBackend(newPrompt)).unwrap();
       alert("Prompt Added Successfully")
@@ -32,7 +37,7 @@ const AddPrompt = () => {
   };
 
   return (
-    <div>
+    <div >
       <h1 className="text-3xl font-bold text-gray-900">
         Add Prompt
       </h1>
@@ -45,7 +50,7 @@ const AddPrompt = () => {
 
         {/* Title */}
         <div className="mb-3">
-          <label className="mb-2 block font-medium">
+          <label className="mb-1 block font-medium">
             Title
           </label>
 
@@ -54,13 +59,13 @@ const AddPrompt = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter prompt title"
-            className="w-full rounded-lg border px-4 py-3 outline-none focus:border-purple-500"
+            className="w-full rounded-lg border px-4 py-2 outline-none focus:border-purple-500"
           />
         </div>
 
         {/* Description */}
         <div className="mb-2">
-          <label className="mb-2 block font-medium">
+          <label className="mb-1 block font-medium">
             Description
           </label>
 
@@ -68,21 +73,21 @@ const AddPrompt = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter prompt description"
-            rows={5}
-            className="w-full rounded-lg border px-4 py-3 outline-none focus:border-purple-500"
+            rows={4}
+            className="w-full rounded-lg border px-4 py-2 outline-none focus:border-purple-500"
           />
         </div>
 
         {/* Category */}
         <div className="mb-4">
-          <label className="mb-2 block font-medium">
+          <label className="mb-1 block font-medium">
             Category
           </label>
 
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full rounded-lg border px-4 py-3"
+            className="w-full rounded-lg border px-4 py-2"
           >
             <option>Coding</option>
             <option>Marketing</option>
@@ -102,14 +107,14 @@ const AddPrompt = () => {
 
           <button
             onClick={() => navigate("/")}
-            className="rounded-lg border px-5 py-2.5"
+            className="rounded-lg border px-5 py-2"
           >
             Cancel
           </button>
 
           <button
             onClick={handleSubmit}
-            className="rounded-lg bg-purple-600 px-5 py-2.5 text-white"
+            className="rounded-lg bg-purple-600 px-5 py-2  text-white"
           >
             Save Prompt
           </button>

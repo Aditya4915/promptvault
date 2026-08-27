@@ -1,12 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-import {
-  getPrompts,
-  createPrompt,
-  updatePrompt,
-  deletePromptApi,
-} from "../api/promptApi";
+import { getPrompts, createPrompt,updatePrompt, deletePromptApi,} from "../api/promptApi";
 
 export interface Prompt {
   id: string;
@@ -94,6 +88,32 @@ export const togglePinBackend = createAsyncThunk(
 );
 
 
+// UPDATE prompt
+export const updatePromptBackend = createAsyncThunk(
+  "prompts/updatePromptBackend",
+  async ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: {
+      title?: string;
+      description?: string;
+      category?: string;
+      favorite?: boolean;
+      pinned?: boolean;
+    };
+  }) => {
+    await updatePrompt(id, data);
+
+    return {
+      id,
+      data,
+    };
+  },
+);
+
+
 // DELETE prompt
 export const deletePromptFromBackend = createAsyncThunk(
   "prompts/deletePromptFromBackend",
@@ -119,7 +139,8 @@ const promptSlice = createSlice({
   },
 
 
-  extraReducers: (builder) => {
+  extraReducers: (builder) => 
+  {
     builder
 
       // =========================
@@ -250,9 +271,37 @@ const promptSlice = createSlice({
             action.error.message ||
             "Failed to delete prompt";
         },
-      );
-  },
-});
+      )
+
+      // =========================
+      // UPDATE
+      // =========================
+
+      .addCase(updatePromptBackend.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(updatePromptBackend.fulfilled, (state, action) => {
+        state.loading = false;
+
+        const prompt = state.prompts.find(
+          (prompt) => prompt.id === action.payload.id
+        );
+
+        if (prompt) {
+          Object.assign(prompt, action.payload.data);
+        }
+      })
+
+      .addCase(updatePromptBackend.rejected, (state, action) => {
+        state.loading = false;
+
+        state.error =
+          action.error.message || "Failed to update prompt";
+      })
+        },
+      });
 
 
 export const {
